@@ -1,69 +1,50 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSystemData } from "@/hooks/useSystemData";
+import { TabStrip } from "@/components/TabStrip";
+import { WeekZone } from "@/components/WeekZone";
+import { DontsZone } from "@/components/DontsZone";
+import { ProgressZone } from "@/components/ProgressZone";
+import { SetupZone } from "@/components/SetupZone";
+import type { Zone } from "@/lib/types";
+
+const WORKOUT_GOAL = 5;
+const SHOW_STATS = true;
+const TEXTURE = true;
 
 export default function Home() {
+  const { data, mutate, resetAll } = useSystemData();
+  const [zone, setZone] = useState<Zone>("week");
+
+  useEffect(() => {
+    document.body.classList.toggle("no-texture", !TEXTURE);
+  }, []);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div
+      style={{
+        position: "relative",
+        minHeight: "100vh",
+        display: "flex",
+        background: "#f4efe2",
+        backgroundImage:
+          "linear-gradient(rgba(90,78,55,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(90,78,55,.055) 1px, transparent 1px)",
+        backgroundSize: "30px 30px",
+        color: "#3b3527",
+      }}
+    >
+      <TabStrip zone={zone} onChange={setZone} />
+      <div style={{ flex: 1, minWidth: 0, padding: "26px 30px 60px" }}>
+        {zone === "week" && (
+          <WeekZone data={data} mutate={mutate} showStats={SHOW_STATS} workoutGoal={WORKOUT_GOAL} goDonts={setZone} />
+        )}
+        {zone === "donts" && <DontsZone data={data} mutate={mutate} />}
+        {zone === "progress" && <ProgressZone data={data} />}
+        {zone === "setup" && (
+          <SetupZone data={data} mutate={mutate} resetAll={resetAll} workoutGoal={WORKOUT_GOAL} />
+        )}
+      </div>
     </div>
   );
 }
